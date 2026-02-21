@@ -6,151 +6,141 @@ import { formatEther } from "viem";
 import Link from "next/link";
 import { ECO_TOKEN_ADDRESS, ECO_TOKEN_ABI, RECYCLING_REGISTRY_ADDRESS, REGISTRY_ABI } from "@/lib/contracts";
 
-const card = {
-  background: "var(--surface)",
-  border: "1px solid var(--border)",
-  borderRadius: 16,
-  padding: "24px",
-};
-
 export default function HomePage() {
   const { address, isConnected } = useAccount();
 
   const { data: balance } = useReadContract({
     address: ECO_TOKEN_ADDRESS, abi: ECO_TOKEN_ABI,
-    functionName: "balanceOf", args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 5000 },
+    functionName: "balanceOf",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address, refetchInterval: 6000 },
   });
 
   const { data: stats } = useReadContract({
     address: RECYCLING_REGISTRY_ADDRESS, abi: REGISTRY_ABI,
-    functionName: "getUserStats", args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 5000 },
+    functionName: "getUserStats",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address, refetchInterval: 6000 },
   });
 
   const { data: globalTotal } = useReadContract({
     address: RECYCLING_REGISTRY_ADDRESS, abi: REGISTRY_ABI,
     functionName: "globalTotalRecycled",
-    query: { refetchInterval: 10000 },
+    query: { refetchInterval: 15000 },
   });
 
   const ecoBalance = balance ? Number(formatEther(balance)).toFixed(1) : "0";
   const bottlesRecycled = stats ? Number(stats[0]) : 0;
 
+  const S = {
+    surface: { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16 } as React.CSSProperties,
+    badge: { display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", padding: "5px 14px", borderRadius: 20, fontSize: 12, color: "var(--green-light)", marginBottom: 28, letterSpacing: "0.5px", textTransform: "uppercase" as const },
+    dot: { width: 6, height: 6, borderRadius: "50%", background: "var(--green-light)", display: "inline-block" },
+  };
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 60 }}>
-
+    <div>
       {/* Hero */}
-      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", padding: "40px 0" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 100, padding: "6px 14px", width: "fit-content" }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green-light)", boxShadow: "0 0 8px var(--green-light)" }} />
-            <span style={{ fontSize: 13, color: "var(--green-light)" }}>Monad Testnet · Chain 10143</span>
-          </div>
-          <h1 style={{ fontSize: 48, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-1px" }}>
-            Recicla.<br />
-            <span style={{ color: "var(--green-light)" }}>Gana.</span><br />
-            Impacta.
-          </h1>
-          <p style={{ fontSize: 17, color: "var(--muted)", lineHeight: 1.7, maxWidth: 420 }}>
-            Una cámara inteligente detecta tus botellas recicladas y envía recompensas en ECO tokens directamente a tu wallet — sin intermediarios, on-chain en Monad.
-          </p>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <ConnectButton label="Conectar Wallet" />
-            {isConnected && (
-              <Link href="/reciclar" style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text)", padding: "10px 20px", borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
-                Registrar botella
-              </Link>
-            )}
-          </div>
+      <section style={{ padding: "72px 0 56px", maxWidth: 760 }}>
+        <div style={S.badge}>
+          <span style={S.dot} />
+          Monad Testnet · Contratos en vivo
         </div>
-
-        {/* ESP32 visual */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div style={{ ...card, background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)", textAlign: "center", padding: 40, position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(82,183,136,0.15) 0%, transparent 70%)" }} />
-            <div style={{ fontSize: 56, marginBottom: 12 }}>📷</div>
-            <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>ESP32-CAM</div>
-            <div style={{ color: "var(--muted)", fontSize: 14 }}>Contenedor inteligente</div>
-            <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8 }}>
-              {[
-                { label: "Detecta botella", status: "active" },
-                { label: "Clasifica material", status: "active" },
-                { label: "Llama al contrato", status: "active" },
-                { label: "Tokens a tu wallet", status: "active" },
-              ].map((step, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.03)", borderRadius: 8, padding: "8px 12px", textAlign: "left" }}>
-                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--green-mid)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, flexShrink: 0 }}>✓</div>
-                  <span style={{ fontSize: 13, color: "var(--text)" }}>{step.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        <h1 style={{ fontSize: "clamp(38px, 6vw, 66px)", fontWeight: 800, lineHeight: 1.08, letterSpacing: "-2px", marginBottom: 24 }}>
+          Recicla.<br />
+          <span style={{ color: "var(--green-light)" }}>Gana tokens.</span><br />
+          <span style={{ color: "var(--muted)" }}>Cuida el planeta.</span>
+        </h1>
+        <p style={{ fontSize: 18, color: "var(--muted)", lineHeight: 1.65, maxWidth: 540, marginBottom: 40 }}>
+          Una cámara ESP32 detecta tus botellas recicladas y registra la recompensa directamente en Monad.
+          Sin intermediarios. Sin papel. Sin excusas.
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <ConnectButton label="Conectar wallet" />
+          {isConnected && (
+            <Link href="/reciclar" style={{ padding: "12px 22px", borderRadius: 10, fontSize: 15, fontWeight: 600, background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text)", textDecoration: "none" }}>
+              Registrar botella
+            </Link>
+          )}
         </div>
       </section>
 
-      {/* Stats globales */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      {/* Métricas globales */}
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 72 }}>
         {[
-          { value: globalTotal?.toString() ?? "0", label: "Botellas recicladas", accent: "var(--green-light)" },
-          { value: "5 ECO", label: "Por botella plástica", accent: "var(--earth)" },
-          { value: "10 ECO", label: "Por lata de aluminio", accent: "var(--monad)" },
+          { value: globalTotal?.toString() ?? "0", label: "Botellas globales", sub: "registradas en la red" },
+          { value: "5 ECO", label: "Por plástico", sub: "recompensa base" },
+          { value: "10 ECO", label: "Por aluminio", sub: "recompensa base" },
         ].map((s, i) => (
-          <div key={i} style={{ ...card, textAlign: "center" }}>
-            <div style={{ fontSize: 32, fontWeight: 800, color: s.accent, marginBottom: 6 }}>{s.value}</div>
-            <div style={{ color: "var(--muted)", fontSize: 14 }}>{s.label}</div>
+          <div key={i} style={{ ...S.surface, padding: "26px 22px" }}>
+            <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-1px", color: "var(--text)", marginBottom: 6 }}>{s.value}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--green-light)", marginBottom: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>{s.sub}</div>
           </div>
         ))}
       </section>
 
       {/* Dashboard usuario */}
       {isConnected && (
-        <section style={{ ...card, border: "1px solid var(--green-mid)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 24 }}>
-            <div>
-              <div style={{ color: "var(--muted)", fontSize: 13, marginBottom: 4 }}>Tu balance</div>
-              <div style={{ fontSize: 42, fontWeight: 800, color: "var(--green-light)" }}>{ecoBalance} <span style={{ fontSize: 20, color: "var(--muted)" }}>ECO</span></div>
-              <div style={{ color: "var(--muted)", fontSize: 14, marginTop: 4 }}>{bottlesRecycled} botellas recicladas</div>
+        <section style={{ ...S.surface, borderColor: "var(--green-mid)", padding: 30, marginBottom: 72 }}>
+          <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 18 }}>Tu actividad</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 22 }}>
+            <div style={{ background: "var(--surface-2)", borderRadius: 12, padding: "18px 20px" }}>
+              <div style={{ fontSize: 38, fontWeight: 800, color: "var(--green-light)", letterSpacing: "-1px" }}>{ecoBalance}</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>ECO tokens</div>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <Link href="/reciclar" style={{ background: "var(--green-mid)", color: "white", padding: "10px 20px", borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
-                + Registrar botella
-              </Link>
-              <Link href="/vouchers" style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text)", padding: "10px 20px", borderRadius: 10, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
-                Canjear rewards
-              </Link>
+            <div style={{ background: "var(--surface-2)", borderRadius: 12, padding: "18px 20px" }}>
+              <div style={{ fontSize: 38, fontWeight: 800, color: "var(--text)", letterSpacing: "-1px" }}>{bottlesRecycled}</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>Botellas recicladas</div>
             </div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Link href="/reciclar" style={{ flex: 1, padding: 14, borderRadius: 10, fontWeight: 700, fontSize: 14, background: "var(--green-mid)", color: "white", textDecoration: "none", textAlign: "center" as const }}>
+              Registrar reciclaje
+            </Link>
+            <Link href="/vouchers" style={{ flex: 1, padding: 14, borderRadius: 10, fontWeight: 700, fontSize: 14, background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text)", textDecoration: "none", textAlign: "center" as const }}>
+              Ver recompensas
+            </Link>
           </div>
         </section>
       )}
 
       {/* Cómo funciona */}
-      <section>
-        <h2 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>¿Cómo funciona?</h2>
-        <p style={{ color: "var(--muted)", marginBottom: 28 }}>Tecnología IoT + blockchain para incentivizar el reciclaje real</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+      <section style={{ marginBottom: 72 }}>
+        <h2 style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-0.5px", marginBottom: 6 }}>Tecnología + Naturaleza</h2>
+        <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 36 }}>El ESP32-CAM es el corazón del sistema. Un contenedor inteligente sin apps adicionales.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
           {[
-            { n: "01", title: "Conecta tu wallet", desc: "MetaMask u otra wallet EVM compatible con Monad" },
-            { n: "02", title: "Ve al contenedor", desc: "El ESP32-CAM detecta y clasifica tu botella automáticamente" },
-            { n: "03", title: "Registro on-chain", desc: "El smart contract registra el reciclaje en Monad Testnet" },
-            { n: "04", title: "Recibe ECO tokens", desc: "Los tokens llegan directo a tu wallet, canjeables por descuentos reales" },
-          ].map((s, i) => (
-            <div key={i} style={{ ...card }}>
-              <div style={{ fontSize: 13, color: "var(--green-light)", fontWeight: 700, marginBottom: 12, fontFamily: "monospace" }}>{s.n}</div>
-              <div style={{ fontWeight: 600, marginBottom: 8 }}>{s.title}</div>
-              <div style={{ color: "var(--muted)", fontSize: 13, lineHeight: 1.6 }}>{s.desc}</div>
+            { n: "01", title: "Cámara detecta", desc: "El ESP32-CAM escanea la botella al insertarla y la clasifica automáticamente por tipo de material.", accent: "var(--green-light)" },
+            { n: "02", title: "Monad registra", desc: "El contenedor llama al smart contract — la transacción queda on-chain en milisegundos.", accent: "var(--monad)" },
+            { n: "03", title: "Tú recibes", desc: "Los ECO tokens llegan directo a tu wallet. 5 ECO por plástico, 10 ECO por aluminio.", accent: "var(--earth)" },
+          ].map((item) => (
+            <div key={item.n} style={{ ...S.surface, padding: "26px 22px", position: "relative", overflow: "hidden" }}>
+              <div style={{ fontSize: 52, fontWeight: 900, color: "var(--border)", position: "absolute", top: -6, right: 14, letterSpacing: "-2px", lineHeight: 1 }}>{item.n}</div>
+              <div style={{ width: 3, height: 28, background: item.accent, borderRadius: 2, marginBottom: 18 }} />
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8, color: "var(--text)" }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6 }}>{item.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Contrato verificado */}
-      <div style={{ textAlign: "center" }}>
-        <a href="https://monad-testnet.socialscan.io/address/0x18590Db5176e85785fb859b4b96E99b0A4D2f817" target="_blank" rel="noopener noreferrer"
-          style={{ color: "var(--muted)", fontSize: 12, textDecoration: "none", fontFamily: "monospace" }}>
-          Contrato verificado · RecyclingRegistry · 0x1859...0A4D2f817
-        </a>
-      </div>
+      {/* Contratos */}
+      <section style={{ ...S.surface, padding: "22px 26px" }}>
+        <div style={{ fontSize: 11, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14 }}>Contratos verificados · Monad Testnet</div>
+        {[
+          { name: "EcoToken (ECO)", addr: "0x03b5e6F27E1b1A1ae5aA990074209FcFaE473222" },
+          { name: "RecyclingRegistry", addr: "0x18590Db5176e85785fb859b4b96E99b0A4D2f817" },
+          { name: "ChallengeManager", addr: "0x1507eFa34a2f9E33ed491526132BfAf6A5C50c97" },
+          { name: "VoucherNFT", addr: "0x188496b92FB6580Dfd9159C40FD5Bf4Fb438d729" },
+        ].map((c) => (
+          <a key={c.addr} href={`https://monad-testnet.socialscan.io/address/${c.addr}`} target="_blank" rel="noopener noreferrer"
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", textDecoration: "none", padding: "10px 12px", background: "var(--surface-2)", borderRadius: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--green-light)" }}>{c.name}</span>
+            <span style={{ fontSize: 11, color: "var(--muted)", fontFamily: "monospace" }}>{c.addr.slice(0,8)}...{c.addr.slice(-6)}</span>
+          </a>
+        ))}
+      </section>
     </div>
   );
 }

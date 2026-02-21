@@ -1,17 +1,15 @@
+
 # Environment / secrets
+# Foundry
+# Node
+# OS
+*.log
+.DS_Store
 .env
 .env.local
-
-# Foundry
-contracts/out/
-contracts/cache/
-contracts/broadcast/
-contracts/.git/
-
-# Node
-node_modules/
 .next/
-*.log
-
-# OS
-.DS_Store
+contracts/.git/
+contracts/broadcast/
+contracts/cache/
+contracts/out/
+node_modules/
