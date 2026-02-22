@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import dynamic from "next/dynamic";
+const ConnectButton = dynamic(() => import("@rainbow-me/rainbowkit").then((mod) => mod.ConnectButton), { ssr: false });
 import { formatEther } from "viem";
 import {
   VOUCHER_NFT_ADDRESS, VOUCHER_NFT_ABI,

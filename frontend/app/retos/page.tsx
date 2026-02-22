@@ -1,7 +1,8 @@
 "use client";
 
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import dynamic from "next/dynamic";
+const ConnectButton = dynamic(() => import("@rainbow-me/rainbowkit").then((mod) => mod.ConnectButton), { ssr: false });
 import { formatEther } from "viem";
 import { CHALLENGE_MANAGER_ADDRESS, CHALLENGE_MANAGER_ABI } from "@/lib/contracts";
 

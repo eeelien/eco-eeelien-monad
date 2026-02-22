@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import dynamic from "next/dynamic";
+const ConnectButton = dynamic(() => import("@rainbow-me/rainbowkit").then((mod) => mod.ConnectButton), { ssr: false });
 import Link from "next/link";
 import { RECYCLING_REGISTRY_ADDRESS, REGISTRY_ABI, BOTTLE_TYPES } from "@/lib/contracts";
 
