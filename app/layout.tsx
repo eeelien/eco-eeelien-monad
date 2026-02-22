@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Providers } from "./providers";
-import { Navbar } from "./navbar";
+import dynamic from "next/dynamic";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Importar Providers SIN SSR — evita que WalletConnect haga requests durante build
+const Providers = dynamic(() => import("./providers").then(m => m.Providers), { ssr: false });
+const Navbar   = dynamic(() => import("./navbar").then(m => m.Navbar),     { ssr: false });
+
 export const metadata: Metadata = {
   title: "eco eeelien — Recicla y Gana en Monad",
-  description: "Registra tus botellas recicladas y gana ECO tokens en Monad Testnet",
+  description: "Registra tus botellas y gana ECO tokens en Monad Testnet",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
